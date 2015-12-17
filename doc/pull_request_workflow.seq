@@ -1,0 +1,75 @@
+@startuml
+skinparam sequence {
+  ArrowColor #183152
+
+  LifeLineBorderColor #375D81
+  LifeLineBackgroundColor #375D81
+
+  ParticipantBorderColor #375D81
+  ParticipantBackgroundColor #375D81
+  ParticipantFontColor White
+  ParticipantFontSize 17
+  ParticipantFontName Aapex
+
+  ActorBackgroundColor #375D81
+  ActorBorderColor #375D81
+  ActorFontColor #183152
+  ActorFontSize 17
+  ActorFontName Aapex
+
+  BoxLineColor #183152
+}
+skinparam shadowing false
+
+actor User
+
+User -> Github: Create PullRequest
+activate Github
+
+Github -> PushToStart: PullRequest Created
+deactivate Github
+activate PushToStart
+
+PushToStart -> Laundromat: Payload Received
+deactivate PushToStart
+activate Laundromat
+
+Laundromat -> Github: Build Started
+
+Laundromat -> Dryer: Analyze Task Requested
+deactivate Laundromat
+activate Dryer
+
+Dryer -> Laundromat: Task Started
+
+Dryer -> Laundromat: Analyze Task Completed
+deactivate Dryer
+activate Laundromat
+
+loop Per Linter
+  Laundromat -> Dryer: Lint Task Requested
+  deactivate Laundromat
+  activate Dryer
+
+  Dryer -> Laundromat: Task Started
+
+  loop Per File
+    Dryer -> Laundromat: File Linted
+    activate Laundromat
+
+    Laundromat -> Github: PullRequest Comment
+    deactivate Laundromat
+  end
+
+  Dryer -> Laundromat: Lint Task Completed
+  deactivate Dryer
+  activate Laundromat
+end
+
+alt No Lint
+  Laundromat -> Github: Build Succeeded
+else Lint
+  Laundromat -> Github: Build Failed
+end
+deactivate Laundromat
+@enduml

@@ -1,2 +1,2 @@
-# lintci
+# LintCI
 Direction and design of LintCI
